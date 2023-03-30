@@ -1,0 +1,89 @@
+---
+title: "Programming in R Final Project"
+author: "Collin Coil"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, message=FALSE}
+library(tidyverse)
+```
+
+
+
+```{r, message=FALSE}
+# Reading in all data using tidyverse
+amsterdam_weekdays <- read_csv("Project_data\\amsterdam_weekdays.csv", col_names = T) %>% mutate(Time = "Weekday", City = "Amsterdam")
+amsterdam_weekends <- read_csv("Project_data\\amsterdam_weekends.csv", col_names = T) %>% mutate(Time = "Weekend", City = "Amsterdam")
+
+athens_weekdays <- read_csv("Project_data\\athens_weekdays.csv", col_names = T) %>% mutate(Time = "Weekday", City = "Athens")
+athens_weekends <- read_csv("Project_data\\athens_weekends.csv", col_names = T) %>% mutate(Time = "Weekend", City = "Athens")
+
+barcelona_weekdays <- read_csv("Project_data\\barcelona_weekdays.csv", col_names = T) %>% mutate(Time = "Weekday", City = "Barcelona")
+barcelona_weekends <- read_csv("Project_data\\barcelona_weekends.csv", col_names = T) %>% mutate(Time = "Weekend", City = "Barcelona")
+
+berlin_weekdays <- read_csv("Project_data\\berlin_weekdays.csv", col_names = T) %>% mutate(Time = "Weekday", City = "Berlin")
+berlin_weekends <- read_csv("Project_data\\berlin_weekends.csv", col_names = T) %>% mutate(Time = "Weekend", City = "Berlin")
+
+budapest_weekdays <- read_csv("Project_data\\budapest_weekdays.csv", col_names = T) %>% mutate(Time = "Weekday", City = "Budapest")
+budapest_weekends <- read_csv("Project_data\\budapest_weekends.csv", col_names = T) %>% mutate(Time = "Weekend", City = "Budapest")
+
+lisbon_weekdays <- read_csv("Project_data\\lisbon_weekdays.csv", col_names = T) %>% mutate(Time = "Weekday", City = "Lisbon")
+lisbon_weekends <- read_csv("Project_data\\lisbon_weekends.csv", col_names = T) %>% mutate(Time = "Weekend", City = "Lisbon")
+
+london_weekdays <- read_csv("Project_data\\london_weekdays.csv", col_names = T) %>% mutate(Time = "Weekday", City = "London")
+london_weekends <- read_csv("Project_data\\london_weekends.csv", col_names = T) %>% mutate(Time = "Weekend", City = "London")
+
+paris_weekdays <- read_csv("Project_data\\paris_weekdays.csv", col_names = T) %>% mutate(Time = "Weekday", City = "Paris")
+paris_weekends <- read_csv("Project_data\\paris_weekends.csv", col_names = T) %>% mutate(Time = "Weekend", City = "Paris")
+
+rome_weekdays <- read_csv("Project_data\\rome_weekdays.csv", col_names = T) %>% mutate(Time = "Weekday", City = "Rome")
+rome_weekends <- read_csv("Project_data\\rome_weekends.csv", col_names = T) %>% mutate(Time = "Weekend", City = "Rome")
+
+vienna_weekdays <- read_csv("Project_data\\vienna_weekdays.csv", col_names = T) %>% mutate(Time = "Weekday", City = "Vienna")
+vienna_weekends <- read_csv("Project_data\\vienna_weekends.csv", col_names = T) %>% mutate(Time = "Weekend", City = "Vienna")
+```
+
+
+
+```{r}
+# Combining the data as a tibble
+BnB_data <- tibble(rbind(amsterdam_weekdays, amsterdam_weekends,
+                 athens_weekdays, athens_weekends,
+                 barcelona_weekdays, barcelona_weekends,
+                 berlin_weekdays, berlin_weekends,
+                 budapest_weekdays, budapest_weekends,
+                 lisbon_weekdays, lisbon_weekends,
+                 london_weekdays, london_weekends,
+                 paris_weekdays, paris_weekends,
+                 rome_weekdays, rome_weekends,
+                 vienna_weekdays, vienna_weekends))
+
+# Combining the data as a data frame
+#BnB_data <- data.frame(rbind(amsterdam_weekdays, amsterdam_weekends,
+                 #athens_weekdays, athens_weekends,
+                 #barcelona_weekdays, barcelona_weekends,
+                 #berlin_weekdays, berlin_weekends,
+                 #budapest_weekdays, budapest_weekends,
+                 #lisbon_weekdays, lisbon_weekends,
+                 #london_weekdays, london_weekends,
+                 #paris_weekdays, paris_weekends,
+                 #rome_weekdays, rome_weekends,
+                 #vienna_weekdays, vienna_weekends))
+
+
+```
+
+
+
+
+
+
+
+
+
+
