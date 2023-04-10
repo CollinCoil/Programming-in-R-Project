@@ -78,6 +78,9 @@ BnB_data <- tibble(rbind(amsterdam_weekdays, amsterdam_weekends,
 
 ```
 
+```{r}
+write.csv(BnB_data, "BnB_data.csv")
+```
 
 
 
