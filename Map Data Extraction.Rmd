@@ -1,0 +1,64 @@
+---
+title: "Map Making Trials"
+author: "Collin Coil"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(ggmap)
+library(maps)
+library(mapdata)
+```
+
+Please see https://bar.rady.ucsd.edu/maps.html for more information about
+mapping in R. 
+
+
+```{r}
+myKey <- "MyKey"
+
+register_google(key = myKey, account_type = "standard", day_limit = 100)
+```
+
+
+```{r}
+# Getting Map Data
+amsterdamMap <- get_map("Amsterdam", maptype='roadmap', color = "bw", zoom=11)
+athensMap <- get_map("Athens", maptype="roadmap", color="bw", zoom = 11)
+barcelonaMap <- get_map("Barcelona", maptype="roadmap", color="bw", zoom = 11)
+berlinMap <- get_map("Berlin", maptype="roadmap", color="bw", zoom = 11)
+budapestMap <- get_map("Budapest", maptype="roadmap", color="bw", zoom = 11)
+lisbonMap <- get_map("Lisbon", maptype="roadmap", color="bw", zoom = 11)
+londonMap <- get_map("London", maptype="roadmap", color="bw", zoom = 11)
+parisMap <- get_map("Paris", maptype="roadmap", color="bw", zoom = 11)
+romeMap <- get_map("Rome", maptype="roadmap", color="bw", zoom = 11)
+viennaMap <- get_map("Vienna", maptype="roadmap", color="bw", zoom = 11)
+
+```
+```{r}
+# Creating basic maps
+eapply(.GlobalEnv, ggmap)
+
+```
+
+
+```{r}
+# Saving the map files
+save(amsterdamMap, file = "amsterdamMap.RData")
+save(athensMap, file = "athensMap.RData")
+save(barcelonaMap, file = "barcelonaMap.RData")
+save(berlinMap, file = "berlinMap.RData")
+save(budapestMap, file = "budapestMap.RData")
+save(lisbonMap, file = "lisbonMap.RData")
+save(londonMap, file = "londonMap.RData")
+save(parisMap, file = "parisMap.RData")
+save(romeMap, file = "romeMap.RData")
+save(viennaMap, file = "viennaMap.RData")
+```
+
