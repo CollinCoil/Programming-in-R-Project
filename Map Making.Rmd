@@ -1,0 +1,30 @@
+---
+title: "Map Making"
+author: "Collin Coil"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(ggmap)
+library(maps)
+library(mapdata)
+```
+
+
+
+```{r}
+ggmap(amsterdamMap) + 
+  geom_point(data = filter(BnB_data, City == "Amsterdam"),
+             mapping = aes(x=lng,y=lat, color = realSum), size = .15) +
+  scale_color_gradient(low = "palevioletred1", high = "mediumorchid3") + 
+  labs(title = "Mapping of AirBnB Listings in Amsterdam", y = "Latitude", 
+       x = "Longitude", color = "Price")
+
+```
+
