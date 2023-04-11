@@ -16,7 +16,7 @@ library(maps)
 library(mapdata)
 ```
 
-Once this code is replicated in the function below, delete it because it is redundant. 
+Once this code is replicated in the function below, delete it because it is redundant.
  
 ```{r}
 # Basic model function to base the loop off of
