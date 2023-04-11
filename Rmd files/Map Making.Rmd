@@ -40,9 +40,13 @@ amsterdam_map
 ```
 
 Please complete this function according to the comments. It should take the string
-of the city name as the input. 
+of the city name as the input.
 
 ```{r}
+# City names
+city_names <- c("amsterdam", "athens", "barcelona", "berlin", "budapest", 
+                "lisbon", "london", "paris", "rome", "vienna")
+
 # This function is the map making function
 map_maker <- function(city){
   # Get the correct city data subset and the map data
@@ -57,5 +61,8 @@ map_maker <- function(city){
 
 
 # for loop that cycles through the cities
+for (city in city_names){
+  NULL
+}
 ```
 
