@@ -1,5 +1,5 @@
 library(tidyverse)
-BnB_data
+BnB_data <- read_csv("Project_Data\\BnB_data.csv")
 
 
 
@@ -76,7 +76,7 @@ load("amsterdamMap.RData")
 ggmap(amsterdamMap) + 
   geom_point(data = filter(BnB_data, City == "Amsterdam"),
              mapping = aes(x=lng,y=lat, color = realSum), size = .15) +
-  scale_colour_gradientn(
+  scale_colour_gradient(
     colours=c('red','yellow','green'), 
     limits=c(0,amsterdam_max), 
     oob = scales::squish) +
@@ -145,3 +145,4 @@ for (name in city_names) {
 
 
               
+
