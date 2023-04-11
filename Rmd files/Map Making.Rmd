@@ -39,6 +39,8 @@ amsterdam_map<- ggmap(amsterdamMap) +
 amsterdam_map
 ```
 
+Please complete this function according to the comments. It should take the string
+of the city name as the input. 
 
 ```{r}
 # This function is the map making function
