@@ -16,15 +16,44 @@ library(maps)
 library(mapdata)
 ```
 
+Once this code is replicated in the function below, delete it because it is redundant. 
+ 
+```{r}
+# Basic model function to base the loop off of
+max_lng <- max(amsterdam$lng)
+min_lng <- min(amsterdam$lng)
+max_lat <- max(amsterdam$lat)
+min_lat <- min(amsterdam$lat)
+
+amsterdam_map<- ggmap(amsterdamMap) + 
+  geom_point(data = filter(BnB_data, City == "Amsterdam"),
+             mapping = aes(x=lng,y=lat, color = realSum), size = .9) +
+  scale_colour_gradientn(
+    colours=c('red','yellow','green'), 
+    limits=c(0,amsterdam_max), 
+    oob = scales::squish) +
+  scale_x_continuous(limits = c(min_lng, max_lng), expand = c(0, 0)) +
+  scale_y_continuous(limits = c(min_lat, max_lat), expand = c(0, 0)) +
+  labs(title = "Mapping of AirBnB Listings in Amsterdam", y = "Latitude", 
+       x = "Longitude", color = "Price") 
+amsterdam_map
+```
 
 
 ```{r}
-ggmap(amsterdamMap) + 
-  geom_point(data = filter(BnB_data, City == "Amsterdam"),
-             mapping = aes(x=lng,y=lat, color = realSum), size = .15) +
-  scale_color_gradient(low = "palevioletred1", high = "mediumorchid3") + 
-  labs(title = "Mapping of AirBnB Listings in Amsterdam", y = "Latitude", 
-       x = "Longitude", color = "Price")
+# This function is the map making function
+map_maker <- function(city){
+  # Get the correct city data subset and the map data
+  
+  # Calculated min and max longitude and latitude
+  
+  # Calculated the range of the Price scale using median and IQU instead of mean and sd
+  
+  # makes the map using ggmap and geom_point
+  
+}
 
+
+# for loop that cycles through the cities
 ```
 
