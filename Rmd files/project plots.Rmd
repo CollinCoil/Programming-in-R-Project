@@ -4,13 +4,21 @@ author: "Nicholas Chen"
 date: "2023-04-17"
 output: html_document
 ---
+```{r setup}
+knitr::opts_knit$set(root.dir = 'C:/Users/Owner/Documents/Programming-in-R-Project')
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+```
+
 ```{r}
 library(tidyverse)
 library(ggmap)
-url1 <- "https://raw.githubusercontent.com/CollinCoil/Programming-in-R-Project/main/Project_Data/BnB_data.csv?token=GHSAT0AAAAAACAZLVQWROLAJB2UFNPDPQWOZB5M3CQ"
-bnb_data <- read.csv(url(url1))
+library(readr)
+bnb_data <- read_csv("Project_Data/BnB_data.csv")
 bnb_data
+
+
 ```
+
 
 Lets get some diagnostic data
 
@@ -42,7 +50,7 @@ bnb_data %>%
   count(combine) %>%
   arrange(desc(n))
 ```
-Mean price bu city and time
+Mean price by city and time
 
 ```{r}
 bnb_data %>%
@@ -93,7 +101,7 @@ amsterdam_max
 
 ```{r}
 
-load("~/Stat-412/Stat-412/amsterdamMap.RData")
+load("Maps/amsterdamMap.RData")
 
 #this gets values for a nice zoom
 max_lng <- max(amsterdam$lng)
