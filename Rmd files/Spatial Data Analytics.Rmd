@@ -11,10 +11,50 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r, message=FALSE, warning=FALSE}
 library(tidyverse)
+library(spgwr)
+```
+
+
+```{r making-factors, warning=FALSE}
+# Mutating the data so that we only have numeric values - necessary for gwr
+BnB_data <- BnB_data %>% mutate(across(where(is.character), as.factor)) %>% 
+  mutate(across(where(is.logical), as.factor)) %>% 
+  select(!room_type)
+
+BnB_data <- fastDummies::dummy_cols(BnB_data, 
+                                    select_columns = c("room_shared", "room_private", "host_is_superhost", "Time", "City"),
+                                    remove_selected_columns = TRUE)
+
+
+
+
+coordinates <- data.matrix(BnB_data[,18:19])
+```
+
+```{r geography-weighted-regression}
+geo_wtd_reg <- gwr(formula = realSum ~ room_shared_TRUE + person_capacity + 
+                              host_is_superhost_TRUE + multi + biz + cleanliness_rating + 
+                              guest_satisfaction_overall + bedrooms + attr_index_norm + 
+                              rest_index_norm + dist + metro_dist + Time_Weekend + 
+                              City_Athens + City_Barcelona + City_Berlin + City_Budapest + 
+                              City_Lisbon + City_London + City_Paris + City_Rome + 
+                              City_Vienna, 
+                   data = BnB_data, coords = coordinates, bandwidth = 0.47,
+                   gweight = gwr.Gauss, longlat = TRUE)
 
 ```
 
 
 
 
-Changes try 2
+
+
+
+
+
+
+
+
+
+
+
