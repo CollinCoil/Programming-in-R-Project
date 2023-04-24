@@ -15,7 +15,7 @@ library(spgwr)
 ```
 
 
-```{r making-factors, warning=FALSE}
+```{r making-factors, warning=FALSE, message=FALSE}
 # Mutating the data so that we only have numeric values - necessary for gwr
 BnB_data <- BnB_data %>% mutate(across(where(is.character), as.factor)) %>% 
   mutate(across(where(is.logical), as.factor)) %>% 
@@ -28,8 +28,28 @@ BnB_data <- fastDummies::dummy_cols(BnB_data,
 
 
 
-coordinates <- data.matrix(BnB_data[,18:19])
+coordinates <- data.matrix(BnB_data[,14:15])
 ```
+
+Do not run the following code. It takes hours to run. Please refer to the 
+bandwidth value I calculated from running this once. 
+```{r bandwidth-selection, eval=FALSE}
+gwr.sel(formula = realSum ~ room_shared_TRUE + person_capacity + 
+                              host_is_superhost_TRUE + multi + biz + cleanliness_rating + 
+                              guest_satisfaction_overall + bedrooms + attr_index_norm + 
+                              rest_index_norm + dist + metro_dist + Time_Weekend + 
+                              City_Athens + City_Barcelona + City_Berlin + City_Budapest + 
+                              City_Lisbon + City_London + City_Paris + City_Rome + 
+                              City_Vienna, 
+                   data = BnB_data, coords = coordinates, verbose = TRUE, 
+        longlat=TRUE, show.error.messages = TRUE)
+```
+After many hours, I got through 16 different bandwidth values before the CV 
+scores stopped decreasing. 220.4048 seems to be about as good as it's going 
+to get. 
+
+
+
 
 ```{r geography-weighted-regression}
 geo_wtd_reg <- gwr(formula = realSum ~ room_shared_TRUE + person_capacity + 
@@ -39,11 +59,10 @@ geo_wtd_reg <- gwr(formula = realSum ~ room_shared_TRUE + person_capacity +
                               City_Athens + City_Barcelona + City_Berlin + City_Budapest + 
                               City_Lisbon + City_London + City_Paris + City_Rome + 
                               City_Vienna, 
-                   data = BnB_data, coords = coordinates, bandwidth = 0.47,
-                   gweight = gwr.Gauss, longlat = TRUE)
+                   data = BnB_data, coords = coordinates, bandwidth = 220.4048,
+                   gweight = gwr.Gauss, longlat = TRUE, se.fit.CCT = TRUE)
 
 ```
-
 
 
 
