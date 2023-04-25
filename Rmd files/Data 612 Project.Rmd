@@ -33,8 +33,8 @@ BnB_data2 <- data.frame(BnB_data)
 kable(head(BnB_data)[,1:8])
 ```
 The data used in the project comes from a research study by Kristof Gyodi and 
-Lukasz Nawaro. The data can be accessed using [this link](https://raw.githubusercontent.com/CollinCoil/Programming-in-R-Project/main/Project_Data/BnB_data.csv). Above, 
-you can see the first few columns and rows of this tibble. Additional code has 
+Lukasz Nawaro. The data can be accessed using [this link](https://raw.githubusercontent.com/CollinCoil/Programming-in-R-Project/main/Project_Data/BnB_data.csv). 
+Above, you can see the first few columns and rows of this tibble. Additional code has 
 been provided to change the tibble into a data frame, but that data frame is not 
 used further in this work. The data frame in this study has `r dim(BnB_data)[1]` 
 rows and `r dim(BnB_data)[2]` columns. The variables included in this include 
