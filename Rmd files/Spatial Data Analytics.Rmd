@@ -60,7 +60,9 @@ geo_wtd_reg <- gwr(formula = realSum ~ room_shared_TRUE + person_capacity +
                               City_Lisbon + City_London + City_Paris + City_Rome + 
                               City_Vienna, 
                    data = BnB_data, coords = coordinates, bandwidth = 220.4048,
-                   gweight = gwr.Gauss, longlat = TRUE, se.fit.CCT = TRUE)
+                   gweight = gwr.Gauss, longlat = TRUE)
+
+geo_wtd_reg
 
 ```
 
