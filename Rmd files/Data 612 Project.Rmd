@@ -1,0 +1,374 @@
+---
+title: "Data 612 Project"
+author: "Collin Coil, Nick Chen"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    code_folding: "hide"
+    number_sections: TRUE
+    toc: true
+    toc_float: true
+    code_download: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_knit$set(root.dir = 'C:/Users/colli/OneDrive/Documents/Programming-in-R-Project/')
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, cache = TRUE)
+```
+
+```{r package-setup
+}
+library(tidyverse)
+library(spgwr)
+library(ggmap)
+library(maps)
+library(mapdata)
+library(knitr)
+```
+
+
+# Data used in the study
+```{r data-upload-and-glimpse}
+BnB_data <- read_csv("Project_Data/BnB_data.csv")
+BnB_data2 <- data.frame(BnB_data)
+kable(head(BnB_data)[,1:8])
+```
+The data used in the project comes from a research study by Kristof Gyodi and 
+Lukasz Nawaro. The data can be accessed using [this link](https://raw.githubusercontent.com/CollinCoil/Programming-in-R-Project/main/Project_Data/BnB_data.csv?token=GHSAT0AAAAAACAPBPU4D33PZH3KG63H2AEGZCG53ZA). Above, 
+you can see the first few columns and rows of this tibble. Additional code has 
+been provided to change the tibble into a data frame, but that data frame is not 
+used further in this work. The data frame in this study has `r dim(BnB_data)[1]` 
+rows and `r dim(BnB_data)[2]` columns. The variables included in this include 
+realSum, the price of accommodation for two people and two nights in Euros; 
+room_type, the type of accommodation; person_capacity, the maximum number of 
+guests; cleanliness_rating, a measure of the cleanliness; dist, the distance 
+from the city center in kilometers; metro_dist, the distance to the nearest 
+metro station in kilometers; and other variables. This data frame also includes 
+information about the latitude and longitude of each Airbnb listing. 
+
+<br>
+<br>
+
+# Exploratory Data Analysis
+
+We are trying to understand the determinants of Airbnb prices in ten European 
+cities. First, we conducted some simple data analysis. 
+
+```{r simple-data-analysis-1}
+BnB_data %>%
+  count(City) %>%
+  arrange(desc(n))
+```
+
+As we see in the table above, there are ten cities in the study, and most of 
+the Airbnb observations were in London and Rome. 
+
+
+```{r simple-analysis-2}
+BnB_data %>% 
+  group_by(City) %>% 
+  summarize(mean_rate = mean(realSum))
+```
+
+The table above shows the average two-night price in Euros for an Airbnb in 
+each city in the study. However, this can be further broken down because our 
+data set has observations for both weekends and weekdays. 
+
+```{r simple-analytics-3}
+BnB_data %>%
+  group_by(City, Time) %>%
+  summarize(price = mean(realSum)) 
+```
+
+As we can see, an Airbnb generally costs more on average during the weekends. 
+This can also be seen in a graph of the data. 
+
+```{r simple-graph-1}
+BnB_data_summarized <- BnB_data %>%
+  group_by(City, Time) %>%
+  summarize(price = mean(realSum)) %>%
+  arrange(desc(price))
+
+ggplot(data = BnB_data_summarized) +
+  geom_bar(mapping = aes(x = reorder(City, price), y = price, fill = Time), stat = "identity", position=position_dodge()) +
+  geom_text(aes(x = City, y = price, label = round(price), group = Time), 
+            position = position_dodge(width = .9), vjust = -.5, size = 3, color ="black")+
+  labs(title = "Mean price of Airbnb listings in European Cities", y = "Mean Price (Euros)", 
+       x = "City") +
+  scale_x_discrete(guide = guide_axis(n.dodge = 2)) + 
+  theme_bw()
+```
+
+Since one of the main goals of this project is to understand how proximity to 
+the city center impacts Airbnb listing price, here is a scatter plot of price
+vs distance. 
+
+```{r simple-graph-2}
+ggplot(data = BnB_data, mapping = aes(x = log(dist), y = log(realSum))) + 
+  geom_point() + 
+  theme_bw() + 
+  labs(title = "Airbnb price vs Distance to City Center", y = "Log Price (Euros)", x = "Log Distance (km)") + 
+  geom_smooth(formula = y~x, method = lm, se = FALSE, color = "firebrick")
+```
+
+As we can see, there appears to be a negative relationship between Airbnb price 
+and distance to the center of a city, but we need to test this relationship. 
+
+<br>
+<br>
+
+
+# Map Making
+
+To better understand the spatial distribution of our Airbnb units and their prices, 
+we made several maps. 
+
+```{r map-making-loop}
+city_names <- c("Amsterdam", "Athens", "Barcelona", "Berlin", "Budapest", "Lisbon", "London", "Paris", "Rome", "Vienna")
+
+map_data <- paste("Maps/", city_names, "Map.RData", sep = "")
+
+for (data in map_data){
+  load(print(data))
+}
+
+
+for (name in city_names) {
+  filtered <- BnB_data %>%
+    filter(City == name)
+  gradient_max <- quantile(filtered$realSum, prob = .75) + 1.5*(quantile(filtered$realSum, prob = .75) - quantile(filtered$realSum, prob = .25))
+  max_lng <- max(filtered$lng)
+  min_lng <- min(filtered$lng)
+  max_lat <- max(filtered$lat)
+  min_lat <- min(filtered$lat)
+  map_lng <- (max_lng + min_lng)/2
+  map_lat <- (max_lat + min_lat)/2
+  
+  city_map <- get(paste(tolower(name), "Map", sep = ""))
+  
+  map<- ggmap(city_map) + 
+    geom_point(data = filter(BnB_data, City == name),
+               mapping = aes(x=lng,y=lat, color = realSum), size = .9) +
+    scale_colour_gradientn(
+      colours=c('red','yellow','green'), 
+      limits=c(0,gradient_max), 
+      oob = scales::squish) +
+    scale_x_continuous(limits = c(min_lng, max_lng), expand = c(0, 0)) +
+    scale_y_continuous(limits = c(min_lat, max_lat), expand = c(0, 0)) +
+    labs(title = paste("Mapping of AirBnB Listings in", name), y = "Latitude", 
+         x = "Longitude", color = "Price") 
+  map_name <- paste(name, "MapPrint", sep = "_")
+  assign(map_name, map)
+}
+
+
+
+Amsterdam_MapPrint
+
+Athens_MapPrint
+
+Budapest_MapPrint
+
+Barcelona_MapPrint
+
+Lisbon_MapPrint
+
+London_MapPrint
+
+Paris_MapPrint
+
+Rome_MapPrint
+
+Vienna_MapPrint
+```
+
+
+
+Now we need to rigorously test the association between price and distance to 
+the city center. 
+
+<br>
+<br>
+<br>
+
+# Geospatial Regression 
+
+We ran a geospatial regression using the `spgwr` package. This allows us to 
+account for spatial autocorrelation in our data. First, we need to mutate our 
+data set to match the requirements for `spgwr::gwr`. All variables that are 
+used in the regression need to be numeric, so the following code changes the 
+tibble to align with the requirements. 
+
+```{r data-reformatting}
+BnB_data <- BnB_data %>% mutate(across(where(is.character), as.factor)) %>% 
+  mutate(across(where(is.logical), as.factor)) %>% 
+  select(!room_type)
+
+BnB_data <- fastDummies::dummy_cols(BnB_data, 
+                                    select_columns = c("room_shared", "room_private", "host_is_superhost", "Time", "City"),
+                                    remove_selected_columns = TRUE)
+
+
+coordinates <- data.matrix(BnB_data[,14:15])
+```
+
+
+
+Do not run the following code. It takes hours to run. Please refer to the 
+bandwidth value I calculated from running this once. 
+
+```{r bandwidth-selection, eval=FALSE}
+gwr.sel(formula = log(realSum) ~ room_shared_TRUE + person_capacity + 
+                              host_is_superhost_TRUE + multi + biz + cleanliness_rating + 
+                              guest_satisfaction_overall + bedrooms + attr_index_norm + 
+                              rest_index_norm + log(dist) + log(metro_dist) + Time_Weekend + 
+                              City_Athens + City_Barcelona + City_Berlin + City_Budapest + 
+                              City_Lisbon + City_London + City_Paris + City_Rome + 
+                              City_Vienna, 
+                   data = BnB_data, coords = coordinates, verbose = TRUE, 
+        longlat=TRUE, show.error.messages = TRUE)
+```
+After many hours, I got through 16 different bandwidth values before the CV 
+scores stopped decreasing substantially. 220.4048 seems to be about as good as 
+it's going to get. 
+
+
+
+
+```{r geography-weighted-regression}
+geo_wtd_reg <- gwr(formula = log(realSum) ~ room_shared_TRUE + person_capacity + 
+                              host_is_superhost_TRUE + multi + biz + cleanliness_rating + 
+                              guest_satisfaction_overall + bedrooms + attr_index_norm + 
+                              rest_index_norm + log(dist) + log(metro_dist) + Time_Weekend + 
+                              City_Athens + City_Barcelona + City_Berlin + City_Budapest + 
+                              City_Lisbon + City_London + City_Paris + City_Rome + 
+                              City_Vienna, 
+                   data = BnB_data, coords = coordinates, bandwidth = 220.4048,
+                   gweight = gwr.Gauss, longlat = TRUE)
+
+head(geo_wtd_reg$SDF)
+
+```
+
+
+Now, we want to represent this data in an easier-to-read format. 
+
+```{r gwr-results-table-and-graph}
+conf_int <- function(mylist) { quantile(mylist, probs = c(0.05, 0.5, 0.95))}
+
+gwr_intervals <- apply(X = data.frame(geo_wtd_reg$SDF), MARGIN = 2, FUN = conf_int) %>% 
+  data.frame() %>% 
+  select(room_shared_TRUE, person_capacity, host_is_superhost_TRUE, multi, biz, 
+         cleanliness_rating, guest_satisfaction_overall, bedrooms, attr_index_norm, 
+         rest_index_norm, log.dist., log.metro_dist., Time_Weekend) %>% 
+  t()
+
+kable(gwr_intervals)
+
+
+gwr_intervals <- gwr_intervals %>% 
+  matrix(ncol = 3) %>% 
+  data.frame() %>% 
+  cbind(c("Shared Room", "Person Capacity", "Superhost", "Multi", "Biz", 
+          "Cleanliness Rating", "Guest Satisfaction", "Bedrooms", "Attr Index",
+          "Rest Index", "Distance", "Metro Distance", "Weekend"))
+
+
+colnames(gwr_intervals) <- c("Lower", "Middle", "Upper", "Variable")
+
+
+
+ggplot(data = gwr_intervals, aes(x = Variable, y = Middle)) + 
+  geom_point() + 
+  geom_errorbar(aes(ymin = Lower, ymax = Upper)) + 
+  scale_x_discrete(guide = guide_axis(n.dodge = 2), labels = label_wrap_gen(10)) + 
+  theme_bw() +
+  labs(title = "Estimates for GWR Regression Coefficients", subtitle = "90% Error Bars", y = "Estimate")
+
+
+```
+
+
+The following plot needs to be fixed. 
+
+```{r, gwr-coefficient-map-Paris}
+
+paris_coefficients <- geo_wtd_reg$SDF[32456:39143,]
+
+
+ filtered <- data.frame(BnB_data) %>%
+     filter(City_Paris == 1)
+   gradient_max <- quantile(paris_coefficients$`log(dist)`, prob = .75) + 1.5*(quantile(paris_coefficients$`log(dist)`, prob = .75) - quantile(paris_coefficients$`log(dist)`, prob = .25))
+   gradient_min <- quantile(paris_coefficients$`log(dist)`, prob = .25) - 1.5*(quantile(paris_coefficients$`log(dist)`, prob = .75) - quantile(paris_coefficients$`log(dist)`, prob = .25))
+  max_lng <- max(filtered$lng)
+  min_lng <- min(filtered$lng)
+  max_lat <- max(filtered$lat)
+  min_lat <- min(filtered$lat)
+  map_lng <- (max_lng + min_lng)/2
+  map_lat <- (max_lat + min_lat)/2
+
+
+gwr.point1 <- ggmap(parisMap) + 
+    geom_point(data = filtered,
+               mapping = aes(x=lng,y=lat, color = paris_coefficients$`log(dist)`), size = .9) +
+    scale_colour_gradientn(
+      colours=c('red','yellow','green'), 
+      limits=c(gradient_min,gradient_max), 
+      oob = scales::squish) +
+    scale_x_continuous(limits = c(min_lng, max_lng), expand = c(0, 0)) +
+    scale_y_continuous(limits = c(min_lat, max_lat), expand = c(0, 0)) +
+    labs(title = paste("Mapping of Distance Coefficient in Paris"), y = "Latitude", 
+         x = "Longitude", color = "Distance Coefficient") 
+  map_name <- paste("Paris_Coefficient_Map")
+  assign(map_name, gwr.point1)
+  
+
+Paris_Coefficient_Map
+
+```
+
+
+```{r gwr-coefficient-map-london}
+
+london_coefficients <- geo_wtd_reg$SDF[22463:32455,]
+
+
+ filtered <- data.frame(BnB_data) %>%
+     filter(City_London == 1)
+   gradient_max <- quantile(london_coefficients$`log(dist)`, prob = .75) + 1.5*(quantile(london_coefficients$`log(dist)`, prob = .75) - quantile(london_coefficients$`log(dist)`, prob = .25))
+   gradient_min <- quantile(london_coefficients$`log(dist)`, prob = .25) - 1.5*(quantile(london_coefficients$`log(dist)`, prob = .75) - quantile(london_coefficients$`log(dist)`, prob = .25))
+  max_lng <- max(filtered$lng)
+  min_lng <- min(filtered$lng)
+  max_lat <- max(filtered$lat)
+  min_lat <- min(filtered$lat)
+  map_lng <- (max_lng + min_lng)/2
+  map_lat <- (max_lat + min_lat)/2
+
+
+gwr.point1 <- ggmap(londonMap) + 
+    geom_point(data = filtered,
+               mapping = aes(x=lng,y=lat, color = london_coefficients$`log(dist)`), size = .9) +
+    scale_colour_gradientn(
+      colours=c('red','yellow','green'), 
+      limits=c(gradient_min,gradient_max), 
+      oob = scales::squish) +
+    scale_x_continuous(limits = c(min_lng, max_lng), expand = c(0, 0)) +
+    scale_y_continuous(limits = c(min_lat, max_lat), expand = c(0, 0)) +
+    labs(title = paste("Mapping of Distance Coefficient in London"), y = "Latitude", 
+         x = "Longitude", color = "Distance Coefficient") 
+  map_name <- paste("London_Coefficient_Map")
+  assign(map_name, gwr.point1)
+  
+
+London_Coefficient_Map
+
+```
+
+
+
+
+
+
+
+
+
