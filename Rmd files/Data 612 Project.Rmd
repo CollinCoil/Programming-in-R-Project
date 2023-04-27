@@ -12,7 +12,7 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_knit$set(root.dir = 'C:/Users/colli/OneDrive/Documents/Programming-in-R-Project/')
+knitr::opts_knit$set(root.dir = 'C:/Users/colli/OneDrive/Documents/School/Classes/Statistical Programming in R/Programming-in-R-Project')
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, cache = TRUE)
 ```
 
@@ -364,7 +364,11 @@ London_Coefficient_Map
 ```
 
 
+# Citations
 
+Gyodi, K., & Nawaro, L. (2021). Determinants of Airbnb prices in European cities: A spatial econometrics approach. *Tourism Management*, 86. doi: 10.1016/j.tourman.2021.104319
+
+All code associated for this project can be found on [GitHub](https://github.com/CollinCoil/Programming-in-R-Project.git)
 
 
 
